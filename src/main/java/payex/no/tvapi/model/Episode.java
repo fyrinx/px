@@ -1,5 +1,6 @@
 package payex.no.tvapi.model;
 
-public class TopNetwork {
+
+public class Episode {
     
 }

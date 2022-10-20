@@ -1,5 +1,5 @@
 package payex.no.tvapi.model;
 
-public class Top {
+public class Network {
     
 }
