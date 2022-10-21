@@ -13,6 +13,8 @@ CREATE table series (
     series_name varchar(250),
     network_id int,
     rating float,
+    episode_count int,
+    released_episode_count int,
     foreign key (network_id) references network(id)
 );
 CREATE table episode (

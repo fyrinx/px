@@ -1,11 +1,18 @@
 package payex.no.tvapi.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Show {
     double rating;
     String showName;
-    ArrayList<String> genres;
+    int networkId,showId,episodeCount,releasedEpisodeCount;
+    String [] genres;
+    
 }
     

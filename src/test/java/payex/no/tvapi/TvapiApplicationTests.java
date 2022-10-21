@@ -13,15 +13,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class TvapiApplicationTests {
 	String[] links={"https://api.tvmaze.com/search/shows?q=girls",
-	"https://api.tvmaze.com/lookup/shows?thetvdb=81189",
+	"https://api.tvmaze.com/search/shows?q=tullball",
 "https://api.tvmaze.com/singlesearch/shows?q=girls&embed=episodes",
 "https://api.tvmaze.com/lookup/shows?imdb=tt0944947",
-"https://api.tvmaze.com/schedule?country=US&date=2014-12-01",
+"https://api.tvmaze.com/search/shows?q=kekwist",
 "https://api.tvmaze.com/schedule/web?date=2020-05-29&country=US",
-"https://api.tvmaze.com/shows/1?embed=cast",
-"https://api.tvmaze.com/alternatelists/1?embed=alternateepisodes",
+"https://api.tvmaze.com/search/people?q=:query",
+"https://api.tvmaze.com/shows/1?embed=nextepisode",
 "https://api.tvmaze.com/shows/1/episodebynumber?season=1&number=1",
-"https://api.tvmaze.com/shows/4/seasons"};
+"https://api.tvmaze.com/shows/1?embed[]=episodes&embed[]=cast"};
 	@Test
 	void contextLoads() {
 	}
@@ -38,7 +38,7 @@ class TvapiApplicationTests {
 		URL url;
 		HttpURLConnection con;
 		Boolean trigger=false;
-		for(int i=0;i<400;i++){
+		for(int i=0;i<100;i++){
 			url=new URL(links[i%10]);
 			con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
@@ -46,8 +46,12 @@ class TvapiApplicationTests {
 			if(con.getResponseCode()==429){
 				trigger=true;
 			}
-			assertEquals(true,trigger);
+			con.disconnect();
+
+			
 		}
+		
+		assertEquals(true,trigger);
 		
 	}
 
