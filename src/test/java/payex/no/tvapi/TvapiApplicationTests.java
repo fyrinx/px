@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 
 import java.net.URL;
-import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,7 +33,7 @@ class TvapiApplicationTests {
 		con.connect();
 		assertEquals(200, con.getResponseCode());
 	}
-	@Test
+	//@Test
 	void connectExess() throws IOException{
 		URL url;
 		HttpURLConnection con;
