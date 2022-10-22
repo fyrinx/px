@@ -1,4 +1,4 @@
-package payex.no.repository;
+package payex.no.tvapi.repository;
 
 import java.util.List;
 
