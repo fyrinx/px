@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Show {
     double rating;
-    String showName;
+    String showName,summary;
     int networkId,showId,episodeCount,releasedEpisodeCount;
     String [] genres;
     
