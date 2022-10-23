@@ -43,7 +43,6 @@ CREATE table nextweek (
 CREATE table genre (
     id int primary key auto_increment not null,
     genre varchar(50),
-    value float
 );
 create table series_genre (
     series_id int,
