@@ -6,7 +6,7 @@ DROP table if exists series;
 DROP table if exists network;
 CREATE table network (
     id int primary key,
-    network varchar(50)
+    name varchar(50)
 );
 CREATE table series (
     id int primary key,
@@ -14,8 +14,7 @@ CREATE table series (
     network_id int,
     rating float,
     episode_count int,
-    released_episode_count int,
-    foreign key (network_id) references network(id)
+    released_episode_count int
 );
 CREATE table episode (
     id int primary key,
@@ -24,9 +23,7 @@ CREATE table episode (
     season_number int,
     episode_number int,
     episode_name varchar(250),
-    rating  float,
-    foreign key (series_id) references series (id),
-    foreign key (network_id) references network (id)
+    rating  float
 );
 CREATE table nextweek (
     series_id int primary key,

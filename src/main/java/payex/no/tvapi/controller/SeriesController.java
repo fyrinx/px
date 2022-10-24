@@ -31,11 +31,7 @@ public class SeriesController {
     }
     @PostMapping("/insert")
     public String addShows(@RequestBody String[] data){
-        if(data.length==60){
-            return "Ok";
-        }else {
-            return "Error";
-        }
+        return showService.batchInsert(data);
     }
 
     @GetMapping("/testapi")

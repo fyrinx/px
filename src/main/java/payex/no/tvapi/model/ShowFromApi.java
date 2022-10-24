@@ -22,6 +22,10 @@ public class ShowFromApi {
     String name,summary;
     @JsonProperty("rating")
     private void unpackNameFromNestedObject(Map<String, Double> rt) {
-    rating = rt.get("average");
+        if(rt.get("average")==null){
+            rating=0.0;
+        }else {
+            rating = rt.get("average");
+        }
 }
 }

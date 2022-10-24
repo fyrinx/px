@@ -31,10 +31,13 @@ import payex.no.tvapi.model.NetworkFromApi;
 import payex.no.tvapi.model.Show;
 import payex.no.tvapi.model.ShowFromApi;
 import payex.no.tvapi.model.ShowGenre;
+import payex.no.tvapi.repository.NetworkRepository;
 import payex.no.tvapi.repository.ShowRepository;
 
 @Service
 public class ShowService {
+    @Autowired
+    NetworkRepository networkRepository;
     @Autowired
     ShowRepository showRepository;
     
@@ -67,12 +70,12 @@ public class ShowService {
         String url="https://api.tvmaze.com/shows/";
         RestTemplate rt=new RestTemplate();
         ObjectMapper mapper=new ObjectMapper();
-        JsonNode[] os=new JsonNode[1];
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         try {
-            Episode[] data = rt.getForObject(url+showId+"/episodes",Episode[].class);
-            
-            System.out.println(data[0]);
-            return data;
+            Object[] data = rt.getForObject(url+showId+"/episodes",Object[].class);
+            Episode[] e=mapper.convertValue(data,Episode[].class);
+            return e;
         } 
         catch(HttpClientErrorException.TooManyRequests e) {
             e.printStackTrace();
@@ -91,7 +94,7 @@ public class ShowService {
         // hasmap with genre as a key, generated id and the count in array 
         Map<String,Integer[]> genres= new HashMap<String,Integer[]>();
         List<Episode> episodes=new ArrayList<Episode>();
-        HashSet<NetworkFromApi> networks=new HashSet<NetworkFromApi>();
+        HashMap<Integer,NetworkFromApi> networks=new HashMap<Integer,NetworkFromApi>();
         List<ShowFromApi> shows=new ArrayList<ShowFromApi>();
         // showId and genreId
         Map<Integer,Integer> showGenres=new HashMap<Integer,Integer>();
@@ -101,9 +104,12 @@ public class ShowService {
                 final ShowFromApi node=queryShowApi(showNames[i]);
                 shows.add(node);
                 episodes.addAll(Arrays.asList(queryEpisodes(node.getId())));
+                if(node.getNetwork()!=null){
+
+                    networks.put(node.getNetwork().getId(),node.getNetwork());
+                    episodes.forEach((e)->{e.setShowName(node.getName());e.setShowId(node.getId());e.setNetworkId(node.getNetwork().getId());});
+                }
                 
-                networks.add(node.getNetwork());
-                episodes.forEach((e)->{e.setShowName(node.getName());e.setNetworkId(node.getNetwork().getId());});
                 String genre;
                 String[] fG= node.getGenres();
                 
@@ -119,9 +125,6 @@ public class ShowService {
                     }
                     
                 }
-                    
-                
-                
                 
             } catch (JsonMappingException e) {
                 // TODO Auto-generated catch block
@@ -133,6 +136,10 @@ public class ShowService {
 
 
         }
+        List<NetworkFromApi> ns=new ArrayList<NetworkFromApi>(networks.values());
+        networkRepository.saveNetworks(ns);
+        showRepository.saveShows(shows);
+        showRepository.saveEpisodes(episodes);
         return "Ok";
     }
 

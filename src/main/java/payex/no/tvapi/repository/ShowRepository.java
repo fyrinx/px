@@ -21,10 +21,12 @@ import payex.no.tvapi.model.ShowFromApi;
 @Repository
 public class ShowRepository implements ShowDao {
 
-    private static final String INSERT_SHOW="INSERT INTO series(id,series_name,networkd_id,rating,episode_count,released_episode_count) VALUES (?,?,?,?,?,?,?)";
-    private static final String INSERT_EPISODE="INSERT INTO episode(id,series_id,networkd_id,season_number,episode_number,episode_name,rating) VALUES(?,?,?,?,?,?,?)";
+    private static final String INSERT_SHOW="INSERT INTO series(id,series_name,network_id,rating,episode_count,released_episode_count) VALUES (?,?,?,?,?,?)";
+    private static final String INSERT_EPISODE="INSERT INTO episode(id,series_id,network_id,season_number,episode_number,episode_name,rating) VALUES(?,?,?,?,?,?,?)";
     @Autowired
     private JdbcTemplate db;
+
+    
     @Override
     public boolean saveShow(ShowFromApi show) {
         db.update(INSERT_SHOW, show.getId(),show.getName(),
@@ -35,16 +37,21 @@ public class ShowRepository implements ShowDao {
     public boolean saveShows(List<ShowFromApi> shows) {
         final int batchSize=60;
         
-        for(int j=0;j<batchSize;j+=batchSize) {
-            final List<ShowFromApi> batchList= shows.subList(j, j+batchSize > shows.size() ? shows.size() : j+batchSize);
+        for(int j=0;j<shows.size();j+=batchSize) {
+            List<ShowFromApi> batchList= shows.subList(j, j+batchSize > shows.size() ? shows.size() : j+batchSize);
             try {
-                db.batchUpdate(INSERT_EPISODE, new BatchPreparedStatementSetter(){
+                db.batchUpdate(INSERT_SHOW, new BatchPreparedStatementSetter(){
                     @Override
                     public void setValues(PreparedStatement ps,int i) throws SQLException {
                         ShowFromApi show = batchList.get(i);
                         ps.setInt(1, show.getId());
                         ps.setString(2, show.getName());
-                        ps.setInt(3,show.getNetwork().getId());
+                        if(show.getNetwork()==null){
+                            ps.setInt(3,0);   
+                        }else {
+                            ps.setInt(3,show.getNetwork().getId());
+                        }
+                        
                         ps.setDouble(4,show.getRating());
                         ps.setInt(5,show.getEpisodeCount());
                         ps.setInt(6,show.getReleasedEpisodeCount());
@@ -67,13 +74,14 @@ public class ShowRepository implements ShowDao {
     public boolean saveEpisodes(List<Episode> episodes) {
         final int batchSize=100;
         
-        for(int j=0;j<batchSize;j+=batchSize) {
-            final List<Episode> batchList= episodes.subList(j, j+batchSize > episodes.size() ? episodes.size() : j+batchSize);
+        for(int j=0;j<episodes.size();j+=batchSize) {
+            List<Episode> batchList= episodes.subList(j, j+batchSize > episodes.size() ? episodes.size() : j+batchSize);
             try {
                 db.batchUpdate(INSERT_EPISODE, new BatchPreparedStatementSetter(){
                     @Override
                     public void setValues(PreparedStatement ps,int i) throws SQLException {
                         Episode e = batchList.get(i);
+                        
                         ps.setInt(1, e.getId());
                         ps.setInt(2, e.getShowId());
                         ps.setInt(3,e.getNetworkId());
