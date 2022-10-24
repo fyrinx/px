@@ -25,7 +25,6 @@ CREATE table episode (
     episode_number int,
     episode_name varchar(250),
     rating  float,
-    season int,
     foreign key (series_id) references series (id),
     foreign key (network_id) references network (id)
 );
@@ -41,8 +40,8 @@ CREATE table nextweek (
     foreign key (series_id) references series(id)
 );
 CREATE table genre (
-    id int primary key auto_increment not null,
-    genre varchar(50),
+    id int primary key,
+    genre varchar(50)
 );
 create table series_genre (
     series_id int,

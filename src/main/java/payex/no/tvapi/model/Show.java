@@ -1,5 +1,7 @@
 package payex.no.tvapi.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +14,7 @@ public class Show {
     double rating;
     String showName,summary;
     int networkId,showId,episodeCount,releasedEpisodeCount;
+    @JsonProperty("genres")
     String [] genres;
     
 }
