@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class ShowDays {
-    int id,lastSeason,lastEpisode;
+    int id,lastSeason,lastReleasedEpisode;
     String[] days;
 
 }

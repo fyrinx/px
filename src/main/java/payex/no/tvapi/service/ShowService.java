@@ -2,6 +2,9 @@ package payex.no.tvapi.service;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -98,17 +101,21 @@ public class ShowService {
         // hasmap with genre as a key, generated id and the count in array 
         Map<String,Integer[]> genres= new HashMap<String,Integer[]>();
         List<Episode> episodes=new ArrayList<Episode>();
+        List<Episode> currentEpisodes;
         HashMap<Integer,NetworkFromApi> networks=new HashMap<Integer,NetworkFromApi>();
         List<ShowFromApi> shows=new ArrayList<ShowFromApi>();
         // showId and genreId
         List<ShowGenre> showGenres=new ArrayList<ShowGenre>();
-        
+        int episodeCount=0;
         List<ShowDays> showDays=new ArrayList<ShowDays>();
         for(int i=0;i<showNames.length;i++){
             try {
                 final ShowFromApi node=queryShowApi(showNames[i]);
                 shows.add(node);
-                episodes.addAll(Arrays.asList(queryEpisodes(node.getId())));
+                currentEpisodes=Arrays.asList(queryEpisodes(node.getId()));
+                episodes.addAll(currentEpisodes);
+                episodeCount=currentEpisodes.size();
+                int releasedEpisodeCount=getLatestEpisode(currentEpisodes);
                 if(node.getNetwork()!=null){
 
                     networks.put(node.getNetwork().getId(),node.getNetwork());
@@ -119,12 +126,13 @@ public class ShowService {
                     });
                 }
                 if(node.getEnded()==null){
-                    int season=episodes.get(episodes.size()-1).getSeason();
-                    int episode=episodes.get(episodes.size()-1).getNumber();
-
-                    showDays.add(new ShowDays(node.getId(),season,episode,node.getDays()));
+                    int season=currentEpisodes.get(currentEpisodes.size()-1).getSeason();
+                    
+            
+                    showDays.add(new ShowDays(node.getId(),season,releasedEpisodeCount,node.getDays()));
                 }
-                
+                node.setEpisodeCount(episodeCount);
+                node.setReleasedEpisodeCount(releasedEpisodeCount);
                 String genre;
                 String[] fG= node.getGenres();
                 
@@ -174,5 +182,19 @@ public class ShowService {
     public List<Show> getAllShows(){
         return showRepository.allShows();
     }
-    
+
+    public int getLatestEpisode(List<Episode> es){
+        DateTimeFormatter dtf=DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate dtEpisode;
+        LocalDate now=LocalDate.now();
+        int minI=0;
+        for(int i=es.size()-1;i>0;i--){
+            dtEpisode=LocalDate.parse(es.get(i).getAirdate(),dtf);
+            if(dtEpisode.compareTo(now)<=0){
+                minI=i;
+                break;
+            }
+        }
+        return minI;
+    }
 }

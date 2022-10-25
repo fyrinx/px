@@ -240,7 +240,7 @@ public class ShowRepository implements ShowDao {
                         for(int k=0;k<days.length;k++){
                             for(int j=0;j<eDays.length;j++){
                                 if(eDays[j].equals(days[k])){
-                                    sb.append(getEpisode(e.getLastSeason(),(e.getLastEpisode()+j)+1));
+                                    sb.append(getEpisode(e.getLastSeason(),(e.getLastReleasedEpisode()+j)+1));
                                     
                                 }
                                 

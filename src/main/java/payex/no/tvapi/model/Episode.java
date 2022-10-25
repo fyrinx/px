@@ -15,7 +15,7 @@ public class Episode {
     
     int id,showId,number,season,networkId;
     double rating;
-    String name;
+    String name,airdate;
     String showName;
     
     @JsonProperty("rating")
