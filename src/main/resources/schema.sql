@@ -1,6 +1,6 @@
 DROP Table if exists series_genre;
 DROP table if exists genre;
-DROP table if exists nextweek;
+DROP table if exists next_week;
 DROP table if exists episode;
 DROP table if exists series;
 DROP table if exists network;
@@ -12,9 +12,12 @@ CREATE table series (
     id int primary key,
     series_name varchar(250),
     network_id int,
+    summary TEXT,
     rating float,
     episode_count int,
-    released_episode_count int
+    released_episode_count int,
+    ended tinyint(1),
+    days varchar(200)
 );
 CREATE table episode (
     id int primary key,
@@ -25,16 +28,9 @@ CREATE table episode (
     episode_name varchar(250),
     rating  float
 );
-CREATE table nextweek (
+CREATE table next_week (
     series_id int primary key,
-    monday varchar(50),
-    tuesday varchar(50),
-    wednesday varchar(50),
-    thursday varchar(50),
-    friday varchar(50),
-    saturday varchar(50),
-    sunday varchar(50),
-    foreign key (series_id) references series(id)
+    days varchar(100)
 );
 CREATE table genre (
     id int primary key,
@@ -43,7 +39,5 @@ CREATE table genre (
 create table series_genre (
     series_id int,
     genre_id int,
-    primary key (series_id,genre_id),
-    foreign key (series_id) references series(id),
-    foreign key (genre_id) references genre(id)
+    primary key (series_id,genre_id)
 );

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,8 +19,8 @@ public class ShowFromApi {
     int id,episodeCount,releasedEpisodeCount;
     double rating;
     NetworkFromApi network;
-    String[] genres;
-    String name,summary;
+    String[] genres,days;
+    String name,summary,ended;
     @JsonProperty("rating")
     private void unpackNameFromNestedObject(Map<String, Double> rt) {
         if(rt.get("average")==null){
@@ -27,5 +28,17 @@ public class ShowFromApi {
         }else {
             rating = rt.get("average");
         }
+    }
+    @JsonProperty("schedule")
+    private void unpackFromNestedObject(ShowTime d){
+        days=d.getDays();
+    }
+
 }
+
+@Data
+@NoArgsConstructor
+class ShowTime {
+    String time;
+    String[] days;
 }

@@ -27,8 +27,10 @@ import org.json.JSONObject;
 import org.springframework.boot.json.JsonParser;
 
 import payex.no.tvapi.model.Episode;
+import payex.no.tvapi.model.Genre;
 import payex.no.tvapi.model.NetworkFromApi;
 import payex.no.tvapi.model.Show;
+import payex.no.tvapi.model.ShowDays;
 import payex.no.tvapi.model.ShowFromApi;
 import payex.no.tvapi.model.ShowGenre;
 import payex.no.tvapi.repository.NetworkRepository;
@@ -49,6 +51,7 @@ public class ShowService {
         ObjectMapper mapper=new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
         try {
             Object[] data = rt.getForObject(url+showName,Object[].class);
             Map<String,Object> om=mapper.convertValue(data[0], Map.class);
@@ -88,6 +91,7 @@ public class ShowService {
             return null;
         }
     }
+    
     @Transactional
     public String batchInsert(String[] showNames){
         int genreId=0;
@@ -97,8 +101,9 @@ public class ShowService {
         HashMap<Integer,NetworkFromApi> networks=new HashMap<Integer,NetworkFromApi>();
         List<ShowFromApi> shows=new ArrayList<ShowFromApi>();
         // showId and genreId
-        Map<Integer,Integer> showGenres=new HashMap<Integer,Integer>();
+        List<ShowGenre> showGenres=new ArrayList<ShowGenre>();
         
+        List<ShowDays> showDays=new ArrayList<ShowDays>();
         for(int i=0;i<showNames.length;i++){
             try {
                 final ShowFromApi node=queryShowApi(showNames[i]);
@@ -107,7 +112,17 @@ public class ShowService {
                 if(node.getNetwork()!=null){
 
                     networks.put(node.getNetwork().getId(),node.getNetwork());
-                    episodes.forEach((e)->{e.setShowName(node.getName());e.setShowId(node.getId());e.setNetworkId(node.getNetwork().getId());});
+                    episodes.forEach((e)->{
+                        e.setShowName(node.getName());
+                        e.setShowId(node.getId());
+                        e.setNetworkId(node.getNetwork().getId());
+                    });
+                }
+                if(node.getEnded()==null){
+                    int season=episodes.get(episodes.size()-1).getSeason();
+                    int episode=episodes.get(episodes.size()-1).getNumber();
+
+                    showDays.add(new ShowDays(node.getId(),season,episode,node.getDays()));
                 }
                 
                 String genre;
@@ -117,11 +132,11 @@ public class ShowService {
                     genre=fG[j];
                     if(genres.containsKey(genre)){
                         genres.put(genre,new Integer[] {genres.get(genre)[0],genres.get(genre)[1]++});
-                        
+                        showGenres.add(new ShowGenre(shows.get(i).getId(),genres.get(genre)[0]));
                     } else {
                         genreId++;
                         genres.put(genre,new Integer[]{genreId,1});
-                        showGenres.put(shows.get(i).getId(),genreId);
+                        showGenres.add(new ShowGenre(shows.get(i).getId(),genreId));
                     }
                     
                 }
@@ -138,10 +153,26 @@ public class ShowService {
         }
         List<NetworkFromApi> ns=new ArrayList<NetworkFromApi>(networks.values());
         networkRepository.saveNetworks(ns);
+        
+        List<Genre> genreList=new ArrayList<Genre>();
+        for(Map.Entry<String,Integer[]> entry : genres.entrySet()){
+            genreList.add(new Genre(entry.getValue()[0], entry.getValue()[1], entry.getKey()));
+        }
+        showRepository.saveGenres(genreList);
+        System.out.println("Saved genres");
         showRepository.saveShows(shows);
+        System.out.println("Saved shows");
+        showRepository.saveShowGenres(showGenres);
+        System.out.println("Saved the genres of shows");
         showRepository.saveEpisodes(episodes);
+        System.out.println("Saved episodes");
+        showRepository.setSchedules(showDays);
+        System.out.println("Saved episode days");
         return "Ok";
     }
-
+    
+    public List<Show> getAllShows(){
+        return showRepository.allShows();
+    }
     
 }

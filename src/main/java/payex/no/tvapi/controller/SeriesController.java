@@ -1,5 +1,6 @@
 package payex.no.tvapi.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONObject;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import payex.no.tvapi.model.Episode;
+import payex.no.tvapi.model.Show;
 import payex.no.tvapi.model.ShowFromApi;
 import payex.no.tvapi.service.ShowService;
 
@@ -31,9 +33,13 @@ public class SeriesController {
     }
     @PostMapping("/insert")
     public String addShows(@RequestBody String[] data){
+        System.out.println("batch triggered");
         return showService.batchInsert(data);
     }
-
+    @GetMapping("/getAllShow")
+    public List<Show> getAllShows() {
+        return showService.getAllShows();    
+    }
     @GetMapping("/testapi")
     public ShowFromApi testapi() throws JsonMappingException, JsonProcessingException{
         ShowFromApi o=showService.queryShowApi("girls");

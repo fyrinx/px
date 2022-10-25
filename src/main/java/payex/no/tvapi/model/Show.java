@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class Show {
     double rating;
     String showName,summary;
-    int networkId,showId,episodeCount,releasedEpisodeCount;
+    int networkId,id,episodeCount,releasedEpisodeCount;
     @JsonProperty("genres")
     String [] genres;
     
