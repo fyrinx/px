@@ -36,6 +36,7 @@ import payex.no.tvapi.model.Show;
 import payex.no.tvapi.model.ShowDays;
 import payex.no.tvapi.model.ShowFromApi;
 import payex.no.tvapi.model.ShowGenre;
+import payex.no.tvapi.model.ShowRating;
 import payex.no.tvapi.repository.NetworkRepository;
 import payex.no.tvapi.repository.ShowRepository;
 
@@ -48,7 +49,7 @@ public class ShowService {
     
     JSONObject o;
     ObjectMapper mapper;
-    public ShowFromApi queryShowApi(String showName) throws JsonMappingException, JsonProcessingException{
+    public ShowFromApi queryShowApi(String showName) throws JsonMappingException, JsonProcessingException,InterruptedException{
         String url="https://api.tvmaze.com/search/shows?q=";
         RestTemplate rt=new RestTemplate();
         ObjectMapper mapper=new ObjectMapper();
@@ -63,16 +64,17 @@ public class ShowService {
             return sApi;
         } 
         catch(HttpClientErrorException.TooManyRequests e) {
-            e.printStackTrace();
+            System.out.println("Handling 429...");
+            Thread.sleep(5000);
             
-            return null; 
+            return queryShowApi(showName); 
         }
         catch(NullPointerException e){
             e.printStackTrace();
             return null;
         }
     }
-    public Episode[] queryEpisodes(int showId){
+    public Episode[] queryEpisodes(int showId) throws InterruptedException{
         String url="https://api.tvmaze.com/shows/";
         RestTemplate rt=new RestTemplate();
         ObjectMapper mapper=new ObjectMapper();
@@ -85,8 +87,13 @@ public class ShowService {
         } 
         catch(HttpClientErrorException.TooManyRequests e) {
             e.printStackTrace();
+              
+            System.out.println("Handling 429...");
+            Thread.sleep(5000);
+            
+            return queryEpisodes(showId); 
+
             //os[0]=mapper.convertValue(e, JsonNode.class);
-            return null; 
         }
         catch(NullPointerException e){
             //os[0]=mapper.convertValue(e, JsonNode.class);
@@ -96,7 +103,7 @@ public class ShowService {
     }
     
     @Transactional
-    public String batchInsert(String[] showNames){
+    public String batchInsert(String[] showNames) throws InterruptedException{
         int genreId=0;
         // hasmap with genre as a key, generated id and the count in array 
         Map<String,Integer[]> genres= new HashMap<String,Integer[]>();
@@ -148,8 +155,11 @@ public class ShowService {
                     }
                     
                 }
-                
-            } catch (JsonMappingException e) {
+            } catch (InterruptedException e){
+              System.out.println("Sleep interrupted");
+              return e.toString();
+            }
+              catch (JsonMappingException e) {
                 // TODO Auto-generated catch block
                 return e.toString();
             } catch (JsonProcessingException e) {
@@ -181,6 +191,9 @@ public class ShowService {
     
     public List<Show> getAllShows(){
         return showRepository.allShows();
+    }
+    public List<ShowRating> getTopTen(){
+        return showRepository.getTopTen();
     }
 
     public int getLatestEpisode(List<Episode> es){

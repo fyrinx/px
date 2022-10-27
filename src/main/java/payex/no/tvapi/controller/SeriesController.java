@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import payex.no.tvapi.model.Episode;
 import payex.no.tvapi.model.Show;
 import payex.no.tvapi.model.ShowFromApi;
+import payex.no.tvapi.model.ShowRating;
 import payex.no.tvapi.service.ShowService;
 
 @RestController
@@ -32,7 +33,7 @@ public class SeriesController {
         return "Så kjekt det var å se deg! :D";
     }
     @PostMapping("/insert")
-    public String addShows(@RequestBody String[] data){
+    public String addShows(@RequestBody String[] data) throws InterruptedException{
         System.out.println("batch triggered");
         return showService.batchInsert(data);
     }
@@ -40,8 +41,14 @@ public class SeriesController {
     public List<Show> getAllShows() {
         return showService.getAllShows();    
     }
+    @GetMapping("/getTopTen")
+    public List<ShowRating> getTopTen(){
+        return showService.getTopTen();
+    }
+    
+    
     @GetMapping("/testapi")
-    public ShowFromApi testapi() throws JsonMappingException, JsonProcessingException{
+    public ShowFromApi testapi() throws JsonMappingException, JsonProcessingException,InterruptedException{
         ShowFromApi o=showService.queryShowApi("girls");
         
         //System.out.println(o);
@@ -49,7 +56,7 @@ public class SeriesController {
 
     }
     @GetMapping("/testEpisode")
-    public Episode[] testEpisode() throws JsonMappingException, JsonProcessingException{
+    public Episode[] testEpisode() throws JsonMappingException, JsonProcessingException,InterruptedException{
         Episode[] os=showService.queryEpisodes(1);
         
         //System.out.println(o);

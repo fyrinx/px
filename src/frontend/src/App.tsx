@@ -1,5 +1,6 @@
 import type { Component } from 'solid-js';
 import File from './components/File'
+import TopTen from './components/Topten';
 
 const App: Component = () => {
 
@@ -7,6 +8,7 @@ const App: Component = () => {
     <div>
         Hello
       <File/>
+      <TopTen/>
     </div>
   );
 };

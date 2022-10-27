@@ -23,6 +23,7 @@ import payex.no.tvapi.model.Show;
 import payex.no.tvapi.model.ShowDays;
 import payex.no.tvapi.model.ShowFromApi;
 import payex.no.tvapi.model.ShowGenre;
+import payex.no.tvapi.model.ShowRating;
 
 @Repository
 public class ShowRepository implements ShowDao {
@@ -40,6 +41,19 @@ public class ShowRepository implements ShowDao {
         db.update(INSERT_SHOW, show.getId(),show.getName(),
         show.getNetwork().getId(),show.getRating(),show.getEpisodeCount(),show.getReleasedEpisodeCount());
         return false;
+    }
+
+    public List<ShowRating> getTopTen(){
+        return db.query("SELECT id,series_name,rating from series order by rating desc limit 10",new RowMapper<ShowRating>(){  
+            @Override  
+            public ShowRating mapRow(ResultSet rs, int rownumber) throws  SQLException    {  
+                  ShowRating s=new ShowRating();  
+                  s.setId(rs.getInt("id"));  
+                  s.setShowName(rs.getString("series_name")); 
+                  s.setRating(rs.getDouble("rating"));  
+                  return s;  
+                }  
+            }); 
     }
     @Override
     public boolean saveShows(List<ShowFromApi> shows) {

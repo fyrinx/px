@@ -21,7 +21,6 @@ const File: Component = () =>{
         reader.onload= function(){
             v=reader.result as String;
             const arr:String[]=v.split(/\r?\n/);
-            arr.push("kek");
             sendData(arr);
             console.log(arr[1]);
         };
