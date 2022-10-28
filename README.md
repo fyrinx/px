@@ -3,8 +3,6 @@
 
 ## Run the software
 
-Denne løsningen krever at du har docker installert med mariaDb som database.  Kjør derfor følgende:
-
 This solution requires that you have docker-installed with MariaDb. Therefore you should have docker installed before running next command.
 
 
