@@ -6,7 +6,11 @@ DROP table if exists series;
 DROP table if exists network;
 CREATE table network (
     id int primary key,
-    name varchar(50)
+    name varchar(50),
+    average_rating float,
+    show_count int,
+    top_rating float,
+    top_show_id int
 );
 CREATE table series (
     id int primary key,

@@ -9,13 +9,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
-import com.fasterxml.jackson.databind.JsonNode;
 
 import payex.no.tvapi.model.Episode;
 import payex.no.tvapi.model.Genre;
@@ -31,7 +32,7 @@ public class ShowRepository implements ShowDao {
     private static final String INSERT_SHOW="INSERT INTO series(id,series_name,network_id,rating,episode_count,released_episode_count,summary,ended,days) VALUES (?,?,?,?,?,?,?,?,?)";
     private static final String GET_SHOW_LIST="SELECT series.*, network.name as network_name, FROM series left join network on network.id=network_id";
     private static final String INSERT_EPISODE="INSERT INTO episode(id,series_id,network_id,season_number,episode_number,episode_name,rating) VALUES(?,?,?,?,?,?,?)";
-    
+    private static final String GET_TOP_EPISODE="SELECT episode.*, series.id as series_id, series_name, network.name as network_name  FROM episode join series on series.id=series_id join network on network.id=episode.network_id where series_id= ";
     @Autowired
     private JdbcTemplate db;
 
@@ -55,6 +56,7 @@ public class ShowRepository implements ShowDao {
                 }  
             }); 
     }
+    
     @Override
     public boolean saveShows(List<ShowFromApi> shows) {
         final int batchSize=60;
@@ -192,6 +194,48 @@ public class ShowRepository implements ShowDao {
                   return s;  
                 }  
             });  
+    }
+    @Override
+    public List<Episode> getTopEpisodes() {
+        List<Episode> episodes=new ArrayList<>();
+        List<Integer> showIds= db.queryForList("SELECT id from series",Integer.class); 
+        //Bad practise!!
+        //Sadly unaware of better ways of doing this
+
+        if(showIds!=null){
+            for(int i=0;i<showIds.size();i++){
+                
+                try{
+                    episodes.add(
+                    db.queryForObject(GET_TOP_EPISODE+showIds.get(i)+" order by rating desc limit 1",new RowMapper<Episode>(){
+                        
+                        @Override
+                        @Nullable
+                        public Episode mapRow(ResultSet rs, int rowNum) throws SQLException {
+                            Episode e=new Episode();
+                            e.setId(rs.getInt("id"));
+                            e.setName(rs.getString("episode_name"));
+                            e.setShowId(rs.getInt("series_id"));
+                            e.setShowName(rs.getString("series_name"));
+                            e.setNetworkId(rs.getInt("network_id"));
+                            e.setNumber(rs.getInt("episode_number"));
+                            e.setSeason(rs.getInt("season_number"));
+                            e.setRating(rs.getDouble("rating"));
+    
+                            return e;
+                        }
+                    }
+                ));
+                } catch(EmptyResultDataAccessException e){
+                    continue;
+                }
+
+                
+    
+            }
+        }
+        
+        return episodes;
     }
     @Override
     public List<Genre> allGenresForShow() {

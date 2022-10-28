@@ -14,8 +14,9 @@ import lombok.NoArgsConstructor;
 public class Episode {
     
     int id,showId,number,season,networkId;
+
     double rating;
-    String name,airdate;
+    String name,airdate,networkName;
     String showName;
     
     @JsonProperty("rating")

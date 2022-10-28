@@ -15,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import payex.no.tvapi.model.Episode;
+import payex.no.tvapi.model.Network;
 import payex.no.tvapi.model.Show;
 import payex.no.tvapi.model.ShowFromApi;
 import payex.no.tvapi.model.ShowRating;
@@ -44,6 +45,15 @@ public class SeriesController {
     @GetMapping("/getTopTen")
     public List<ShowRating> getTopTen(){
         return showService.getTopTen();
+    }
+
+    @GetMapping("/getNetworks")
+    public List<Network> getNetwork(){
+        return showService.getNetworks();
+    }
+    @GetMapping("/getTopEpisodes")
+    public List<Episode> getTopEpisodes(){
+        return showService.getEpisodes();
     }
     
     

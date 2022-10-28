@@ -31,6 +31,7 @@ import org.springframework.boot.json.JsonParser;
 
 import payex.no.tvapi.model.Episode;
 import payex.no.tvapi.model.Genre;
+import payex.no.tvapi.model.Network;
 import payex.no.tvapi.model.NetworkFromApi;
 import payex.no.tvapi.model.Show;
 import payex.no.tvapi.model.ShowDays;
@@ -123,10 +124,28 @@ public class ShowService {
                 episodes.addAll(currentEpisodes);
                 episodeCount=currentEpisodes.size();
                 int releasedEpisodeCount=getLatestEpisode(currentEpisodes);
+                
+                int showCount=0;
                 if(node.getNetwork()!=null){
-
-                    networks.put(node.getNetwork().getId(),node.getNetwork());
-                    episodes.forEach((e)->{
+                    
+                    if(networks.get(node.getNetwork().getId())!=null){
+                        showCount=networks.get(node.getNetwork().getId()).getShowCount();
+                        networks.get(node.getNetwork().getId()).setShowCount(showCount+1);
+                        networks.get(node.getNetwork().getId()).getRatings().add(node.getRating());
+                        if(networks.get(node.getNetwork().getId()).getTopRating()<node.getRating()){
+                            networks.get(node.getNetwork().getId()).setTopRating(node.getRating());
+                            networks.get(node.getNetwork().getId()).setTopRatedShow(node.getId());
+                        }
+                    }else {
+                        networks.put(node.getNetwork().getId(),node.getNetwork());
+                        networks.get(node.getNetwork().getId()).setShowCount(1);
+                        networks.get(node.getNetwork().getId()).setRatings(new ArrayList<Double>());
+                        networks.get(node.getNetwork().getId()).getRatings().add(node.getRating());
+                        networks.get(node.getNetwork().getId()).setTopRating(node.getRating());
+                        networks.get(node.getNetwork().getId()).setTopRatedShow(node.getId());
+                    }
+                    
+                    currentEpisodes.forEach((e)->{
                         e.setShowName(node.getName());
                         e.setShowId(node.getId());
                         e.setNetworkId(node.getNetwork().getId());
@@ -194,6 +213,12 @@ public class ShowService {
     }
     public List<ShowRating> getTopTen(){
         return showRepository.getTopTen();
+    }
+    public List<Episode> getEpisodes(){
+        return showRepository.getTopEpisodes();
+    }
+    public List<Network> getNetworks(){
+        return networkRepository.getTopSeriesPerNetwork();
     }
 
     public int getLatestEpisode(List<Episode> es){

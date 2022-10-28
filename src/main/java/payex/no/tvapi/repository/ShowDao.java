@@ -23,4 +23,5 @@ public interface ShowDao {
     List<Show> allShows();
     List<Genre> allGenresForShow();
     boolean setSchedules(List<ShowDays> sds);
+    List<Episode> getTopEpisodes();
 }
