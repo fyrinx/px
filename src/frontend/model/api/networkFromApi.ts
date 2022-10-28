@@ -8,5 +8,9 @@
 
 export interface NetworkFromApi {
   id?: number;
+  showCount?: number;
+  topRatedShow?: number;
   name?: string;
+  ratings?: number[];
+  topRating?: number;
 }

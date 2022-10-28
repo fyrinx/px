@@ -1,19 +1,16 @@
 package payex.no.tvapi.service;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.json.JsonParserFactory;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
@@ -22,17 +19,17 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import org.json.JSONObject;  
-import org.springframework.boot.json.JsonParser;
 
 import payex.no.tvapi.model.Episode;
 import payex.no.tvapi.model.Genre;
 import payex.no.tvapi.model.Network;
 import payex.no.tvapi.model.NetworkFromApi;
+import payex.no.tvapi.model.NextWeek;
 import payex.no.tvapi.model.Show;
 import payex.no.tvapi.model.ShowDays;
 import payex.no.tvapi.model.ShowFromApi;
@@ -188,24 +185,31 @@ public class ShowService {
 
 
         }
+        boolean saveNetworks;
         List<NetworkFromApi> ns=new ArrayList<NetworkFromApi>(networks.values());
-        networkRepository.saveNetworks(ns);
+        saveNetworks=networkRepository.saveNetworks(ns);
         
         List<Genre> genreList=new ArrayList<Genre>();
         for(Map.Entry<String,Integer[]> entry : genres.entrySet()){
             genreList.add(new Genre(entry.getValue()[0], entry.getValue()[1], entry.getKey()));
         }
-        showRepository.saveGenres(genreList);
-        System.out.println("Saved genres");
-        showRepository.saveShows(shows);
-        System.out.println("Saved shows");
-        showRepository.saveShowGenres(showGenres);
-        System.out.println("Saved the genres of shows");
-        showRepository.saveEpisodes(episodes);
-        System.out.println("Saved episodes");
-        showRepository.setSchedules(showDays);
-        System.out.println("Saved episode days");
-        return "Ok";
+
+        boolean saveGenres,saveShows,saveShowGenres,savedEpisodes,savedShowDays;
+        saveGenres=showRepository.saveGenres(genreList);
+        
+        saveShows=showRepository.saveShows(shows);
+        
+        saveShowGenres=showRepository.saveShowGenres(showGenres);
+        
+        savedEpisodes=showRepository.saveEpisodes(episodes);
+        
+        savedShowDays=showRepository.setSchedules(showDays);
+        if(saveNetworks&&saveGenres&&saveShows&&saveShowGenres&&savedEpisodes&&savedShowDays){
+            return "Ok";
+        }else {
+            return "Something went wrong";
+        }
+        
     }
     
     public List<Show> getAllShows(){
@@ -234,5 +238,8 @@ public class ShowService {
             }
         }
         return minI;
+    }
+    public List<NextWeek> getNextWeek(){
+        return showRepository.getNextWeek();
     }
 }

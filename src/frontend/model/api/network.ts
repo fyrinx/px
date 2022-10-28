@@ -6,15 +6,11 @@
  * OpenAPI spec version: v0.0.1
  */
 
-export interface Episode {
+export interface Network {
   id?: number;
-  showId?: number;
-  number?: number;
-  season?: number;
-  networkId?: number;
-  rating?: number;
-  name?: string;
-  airdate?: string;
+  showCount?: number;
+  averageRating?: number;
+  topRating?: number;
+  topRatedShow?: string;
   networkName?: string;
-  showName?: string;
 }

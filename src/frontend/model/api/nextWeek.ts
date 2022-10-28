@@ -6,15 +6,8 @@
  * OpenAPI spec version: v0.0.1
  */
 
-export interface Episode {
-  id?: number;
+export interface NextWeek {
   showId?: number;
-  number?: number;
-  season?: number;
-  networkId?: number;
-  rating?: number;
-  name?: string;
-  airdate?: string;
-  networkName?: string;
   showName?: string;
+  dayString?: string;
 }

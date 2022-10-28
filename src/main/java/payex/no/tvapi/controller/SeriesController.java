@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import payex.no.tvapi.model.Episode;
 import payex.no.tvapi.model.Network;
+import payex.no.tvapi.model.NextWeek;
 import payex.no.tvapi.model.Show;
 import payex.no.tvapi.model.ShowFromApi;
 import payex.no.tvapi.model.ShowRating;
@@ -29,10 +30,6 @@ public class SeriesController {
 
     @Autowired
     ShowService showService;
-    @GetMapping("/hi")
-    public String hello(){
-        return "Så kjekt det var å se deg! :D";
-    }
     @PostMapping("/insert")
     public String addShows(@RequestBody String[] data) throws InterruptedException{
         System.out.println("batch triggered");
@@ -55,7 +52,10 @@ public class SeriesController {
     public List<Episode> getTopEpisodes(){
         return showService.getEpisodes();
     }
-    
+    @GetMapping("/getNextWeek")
+    public List<NextWeek> getNextWeek(){
+        return showService.getNextWeek();
+    }
     
     @GetMapping("/testapi")
     public ShowFromApi testapi() throws JsonMappingException, JsonProcessingException,InterruptedException{

@@ -7,7 +7,7 @@
  */
 
 export interface ShowRating {
-  id: number;
-  showName: string;
-  rating: number;
+  id?: number;
+  showName?: string;
+  rating?: number;
 }

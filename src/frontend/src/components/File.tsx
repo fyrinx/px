@@ -17,12 +17,10 @@ const File: Component = () =>{
         let reader=new FileReader();
         reader.readAsText(store() as File);
         var v: String = "";
-        console.log(store() as File);
         reader.onload= function(){
             v=reader.result as String;
             const arr:String[]=v.split(/\r?\n/);
             sendData(arr);
-            console.log(arr[1]);
         };
         
         

@@ -10,6 +10,7 @@ export interface Show {
   rating?: number;
   showName?: string;
   summary?: string;
+  networkName?: string;
   networkId?: number;
   id?: number;
   episodeCount?: number;

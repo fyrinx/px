@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import payex.no.tvapi.model.Episode;
 import payex.no.tvapi.model.Genre;
+import payex.no.tvapi.model.NextWeek;
 import payex.no.tvapi.model.Show;
 import payex.no.tvapi.model.ShowDays;
 import payex.no.tvapi.model.ShowFromApi;
@@ -23,5 +24,6 @@ public interface ShowDao {
     List<Show> allShows();
     List<Genre> allGenresForShow();
     boolean setSchedules(List<ShowDays> sds);
+    List<NextWeek> getNextWeek();
     List<Episode> getTopEpisodes();
 }

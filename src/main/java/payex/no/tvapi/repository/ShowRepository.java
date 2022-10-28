@@ -20,6 +20,7 @@ import org.springframework.stereotype.Repository;
 
 import payex.no.tvapi.model.Episode;
 import payex.no.tvapi.model.Genre;
+import payex.no.tvapi.model.NextWeek;
 import payex.no.tvapi.model.Show;
 import payex.no.tvapi.model.ShowDays;
 import payex.no.tvapi.model.ShowFromApi;
@@ -30,7 +31,7 @@ import payex.no.tvapi.model.ShowRating;
 public class ShowRepository implements ShowDao {
 
     private static final String INSERT_SHOW="INSERT INTO series(id,series_name,network_id,rating,episode_count,released_episode_count,summary,ended,days) VALUES (?,?,?,?,?,?,?,?,?)";
-    private static final String GET_SHOW_LIST="SELECT series.*, network.name as network_name, FROM series left join network on network.id=network_id";
+    private static final String GET_SHOW_LIST="SELECT series.*, network.name as network_name FROM series left join network on network.id=network_id;";
     private static final String INSERT_EPISODE="INSERT INTO episode(id,series_id,network_id,season_number,episode_number,episode_name,rating) VALUES(?,?,?,?,?,?,?)";
     private static final String GET_TOP_EPISODE="SELECT episode.*, series.id as series_id, series_name, network.name as network_name  FROM episode join series on series.id=series_id join network on network.id=episode.network_id where series_id= ";
     @Autowired
@@ -189,6 +190,7 @@ public class ShowRepository implements ShowDao {
                   s.setRating(rs.getDouble("rating"));  
                   s.setSummary(rs.getString("summary"));
                   s.setNetworkId(rs.getInt("network_id"));
+                  s.setNetworkName(rs.getString("network_name"));
                   s.setEpisodeCount(rs.getInt("episode_count")); 
                   s.setReleasedEpisodeCount(rs.getInt("released_episode_count"));
                   return s;  
@@ -218,6 +220,7 @@ public class ShowRepository implements ShowDao {
                             e.setShowId(rs.getInt("series_id"));
                             e.setShowName(rs.getString("series_name"));
                             e.setNetworkId(rs.getInt("network_id"));
+                            e.setNetworkName(rs.getString("network_name"));
                             e.setNumber(rs.getInt("episode_number"));
                             e.setSeason(rs.getInt("season_number"));
                             e.setRating(rs.getDouble("rating"));
@@ -329,5 +332,19 @@ public class ShowRepository implements ShowDao {
     
     private String getEpisode(int s,int e){
         return String.format("%02d%02d",s,e);
+    }
+
+    @Override
+    public List<NextWeek> getNextWeek() {
+        return db.query("SELECT next_week.*, series.series_name from next_week join series on series.id=next_week.series_id",new RowMapper<NextWeek>(){  
+            @Override  
+            public NextWeek mapRow(ResultSet rs, int rownumber) throws  SQLException    {  
+                  NextWeek s=new NextWeek();  
+                  s.setShowId(rs.getInt("series_id"));  
+                  s.setShowName(rs.getString("series_name"));
+                  s.setDayString(rs.getString("days"));
+                  return s;  
+                }  
+            });  
     }
 }
