@@ -9,7 +9,7 @@ const App: Component = () => {
 
   return (
     <div>
-        Hello
+      This site is used for series-data
       <File/>
       For all these, click the left button before the right button.
       The values from clicking the left button are obtained in console.log.
